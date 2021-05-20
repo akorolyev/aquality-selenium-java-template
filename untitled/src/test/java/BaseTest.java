@@ -1,15 +1,19 @@
 import aquality.selenium.browser.AqualityServices;
+
+import aquality.selenium.template.configurations.Configuration;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
 public abstract class BaseTest {
+
+
     private int stepNumber;
 
     @BeforeClass(alwaysRun = true)
     public void beforeMethod() {
         stepNumber = 1;
         AqualityServices.getBrowser().maximize();
-        AqualityServices.getBrowser().goTo("https://userinyerface.com/game.html%20target=");
+        AqualityServices.getBrowser().goTo(Configuration.getStartUrl());
         AqualityServices.getBrowser().waitForPageToLoad();
 
     }
@@ -17,7 +21,7 @@ public abstract class BaseTest {
     @AfterClass(alwaysRun = true)
     public void afterTest() {
         if (AqualityServices.isBrowserStarted()) {
-            //AqualityServices.getBrowser().quit();
+            AqualityServices.getBrowser().quit();
         }
     }
 

@@ -6,52 +6,56 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Properties;
 
 
 public class TestUser extends BaseTest {
 
-    private static final String EXPECTED_URL_WELCOME_PAGE = "https://userinyerface.com/game.html%20target=";
-    private static final String EXPECTED_NAME_FIRST_CARD = "1 / 4";
-    private static final String EXPECTED_NAME_SECOND_CARD = "2 / 4";
-    private static final String EXPECTED_NAME_THIRD_CARD = "3 / 4";
+
     private static final String EXPECTED_URL_SECOND_PAGE = "https://userinyerface.com/game.html";
-    private static final String EXPECTED_TIMER_VALUE = "00:00:00";
+    private Properties properties = new Properties();
     private WelcomePage welcomePage;
     private IElementFactory elementFactory = AqualityServices.getElementFactory();
 
 
 
     @BeforeTest
-    private void setUp() {
+    private void setUp() throws IOException {
         welcomePage = new WelcomePage();
+        try (Reader reader = new FileReader("src/main/resources/config.properties")) {
+            properties.load(reader);
+        }
     }
 
     @Test
     public void testTreeCardsShouldBeOpened() throws InterruptedException {
         SoftAssert softAssert = new SoftAssert();
-        softAssert.assertEquals(AqualityServices.getBrowser().getCurrentUrl(), EXPECTED_URL_WELCOME_PAGE);
         SecondPage secondPage = welcomePage.createSecondPageByClickHere();
-        softAssert.assertEquals(secondPage.getCardName().getText(), EXPECTED_NAME_FIRST_CARD);
-        secondPage.getPasswordBox().clearAndType("Aqua111111");
-        secondPage.getEmail().clearAndType("Adrew");
-        secondPage.getDomain().clearAndType("gmail");
+        softAssert.assertEquals(secondPage.getCardName().getText(), properties.getProperty("EXPECTED_NAME_FIRST_CARD"));
+        secondPage.setEmail("Adrew");
+        secondPage.setPassword("Aqua111111");
+        secondPage.setDomain("gmail");
         secondPage.insertOrgCode();
         secondPage.getTerms().click();
         secondPage.getNextButton().click();
-        softAssert.assertEquals(secondPage.getCardName().getText(), EXPECTED_NAME_SECOND_CARD);
-        secondPage.insertInterestChecks();
-        secondPage.testUpload();
-        softAssert.assertEquals(secondPage.getCardName().getText(), EXPECTED_NAME_THIRD_CARD);
+        softAssert.assertEquals(secondPage.getCardName().getText(), properties.getProperty("EXPECTED_NAME_SECOND_CARD"));
+        secondPage.insertInterestChecks(3);
+        secondPage.testUpload(properties.getProperty("imageName"));
+        softAssert.assertEquals(secondPage.getCardName().getText(), properties.getProperty("EXPECTED_NAME_THIRD_CARD"));
     }
 
     @Test
-    public void testHelpFormIsHidden(){
+    public void testHelpFormIsHidden() throws IOException{
         SoftAssert softAssert = new SoftAssert();
         SecondPage secondPage = welcomePage.createSecondPageByClickHere();
         softAssert.assertEquals(AqualityServices.getBrowser().getCurrentUrl(), EXPECTED_URL_SECOND_PAGE);
         secondPage.getHelpFormButton().click();
         secondPage.getHelpFormButton().state().waitForNotDisplayed();
         softAssert.assertFalse(secondPage.getHelpFormButton().state().isDisplayed());
+
     }
 
     @Test
@@ -68,8 +72,7 @@ public class TestUser extends BaseTest {
     public void testTimerStartFromZero(){
         SoftAssert softAssert = new SoftAssert();
         SecondPage secondPage = welcomePage.createSecondPageByClickHere();
-        softAssert.assertEquals(secondPage.getTimer().getText(), EXPECTED_TIMER_VALUE);
-
+        softAssert.assertEquals(secondPage.getTimer().getText(), properties.getProperty("EXPECTED_TIMER_VALUE"));
 
     }
 }
