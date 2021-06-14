@@ -1,4 +1,5 @@
-package aquality.selenium.template.configuration;
+
+package aquality.selenium.template.configurations;
 
 public class Configuration {
 

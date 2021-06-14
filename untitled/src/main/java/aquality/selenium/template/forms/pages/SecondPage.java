@@ -28,6 +28,7 @@ public class SecondPage extends BaseAppForm {
     private IButton acceptedCookies = elementFactory.getButton(By.xpath("//button[contains(@class,'button') and contains (@class,'button--solid button--transparent')]"), "acceptedCookies");
     private IButton uploadButtom = getElementFactory().getButton(By.xpath("//a[@class='avatar-and-interests__upload-button']"), "uploadButton");
     private IElement timer = elementFactory.get(ElementType.LABEL, By.xpath("//div[@class='timer timer--white timer--center']"), "timer");
+    private IButton nextButtonOnSecondPage = elementFactory.getButton(By.xpath("//button[contains(@class, 'button--stroked button--white button--fluid')]"), "Next Button");
     String separator = File.separator;
 
     SecondPage() {
@@ -37,47 +38,39 @@ public class SecondPage extends BaseAppForm {
     public IElement getTimer() {
         return timer;
     }
-
     public IButton getAcceptedCookies() {
         return acceptedCookies;
     }
-
     public IElement getHelpFormLabel() {
         return helpFormLabel;
     }
-
     public IButton getUploadButton() {
         return uploadButton;
     }
-
     public ITextBox getCardName() {
         return cardName;
     }
-
     public IElement getTerms() {
         return terms;
     }
-
     public IButton getNextButton() {
         return nextButton;
     }
-
     public IButton getHelpFormButton() {
         return helpFormButton;
     }
-
+    public IButton getNextButtonOnSecondPage(){
+        return nextButtonOnSecondPage;
+    }
     public void setPassword(String password) {
         passwordBox.clearAndType(password);
     }
-
     public void setEmail(String email) {
         emailBox.clearAndType(email);
     }
-
     public void setDomain(String domain) {
         domainBox.clearAndType(domain);
     }
-
     public void insertOrgCode() throws InterruptedException {
         opener.click();
         List<IElement> orgCodeLists = getElementFactory().findElements(By.cssSelector("div.dropdown__list-item"), ElementType.LABEL);
@@ -90,36 +83,32 @@ public class SecondPage extends BaseAppForm {
         getElementFactory().getButton((By.xpath(String.format("(//div[@class='dropdown__list-item' and text()='%s'])", itemName))), itemName).click();
 
     }
-
     public void insertInterestChecks(int count) {
-        int optionsListSize = elementFactory.findElements(By.xpath("//*[@class='avatar-and-interests__interests-list']//span[2]"), ElementType.LABEL).size();
-        List<ICheckBox> valuesList = new ArrayList<>();
-        for (int i = 1; i <= optionsListSize; i++) {
-            valuesList.add(elementFactory.getCheckBox(By.xpath(String.format("//*[@class='avatar-and-interests__interests-list']/div[%d]//label", i)), "name"));
+        List<IElement> optionsList = elementFactory.findElements(By.xpath("//*[@class='avatar-and-interests__interests-list']//span[2]"), ElementType.LABEL);
+        Map<String,Integer> valuesMap = new HashMap<>();
+        for (int i = 0; i < optionsList.size(); i++) {
+            valuesMap.put(optionsList.get(i).getText(),i+1);
         }
-        valuesList.get(20).click();
-        valuesList.remove(17);
-        valuesList.remove(19);
+        ICheckBox unselectAllCheckbox = elementFactory.getCheckBox(By.xpath("//*[@class='avatar-and-interests__interests-list']/div[21]//label"),
+                  "Unselect all");
+        unselectAllCheckbox.click();
+        valuesMap.remove("Unselect all");
+        valuesMap.remove("Select all");
+
         for (int i = 0; i < count; i++) {
-            int randNumber = (int) (Math.random() * valuesList.size());
-            valuesList.get(randNumber).click();
-            valuesList.remove(randNumber);
+            int randNumber = (int) (Math.random() * valuesMap.size());
+            ICheckBox tempCheckbox = elementFactory.getCheckBox(By.xpath("//*[@class='avatar-and-interests__interests-list']/div["+ randNumber +"]//label"),
+                    "");
+            tempCheckbox.click();
+            valuesMap.remove(randNumber);
+
         }
     }
-
-    public Properties extractProperty() throws IOException {
-        Properties props = new Properties();
-
-        return props;
-    }
-
     public void testUpload(String image) throws InterruptedException {
         uploadButtom.click();
         Thread.sleep(2000);
         File file = new File("src/main/resources/images/" + image);
-        String absolutePath = file.getAbsolutePath();
-        uploadFile(absolutePath);
+        uploadFile(file);
         Thread.sleep(4000);
     }
-
 }

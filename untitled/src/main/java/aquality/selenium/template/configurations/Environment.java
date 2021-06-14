@@ -1,4 +1,4 @@
-package aquality.selenium.template.configuration;
+package aquality.selenium.template.configurations;
 
 import aquality.selenium.browser.AqualityServices;
 import aquality.selenium.core.utilities.ISettingsFile;

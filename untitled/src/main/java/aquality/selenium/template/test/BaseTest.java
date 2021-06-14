@@ -1,3 +1,5 @@
+package aquality.selenium.template.test;
+
 import aquality.selenium.browser.AqualityServices;
 
 import aquality.selenium.template.configurations.Configuration;
